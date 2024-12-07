@@ -21,68 +21,38 @@ import clsx from 'clsx';
 export const ArticleParamsForm = ({
 	styleSetter,
 }: {
-	styleSetter: React.Dispatch<React.SetStateAction<ArticleStateType | null>>;
+	styleSetter: React.Dispatch<React.SetStateAction<ArticleStateType>>;
 }) => {
-	//font selection
-	const [selectedFont, setSelectedFont] = useState<OptionType>(
-		fontFamilyOptions[0]
-	);
-	//font selection
-
-	//font size radio selection
-	const [selectedSize, setSelectedSize] = useState(fontSizeOptions[0]);
-	//font size radio selection
-
-	//font color selection
-	const [selectedColor, setSelectedColor] = useState<OptionType>(fontColors[0]);
-	//font color selection
-
-	//bg color selection
-	const [selectedBGColor, setSelectedBGColor] = useState<OptionType>(
-		backgroundColors[0]
-	);
-	//bg color selection
-
-	//content width selection
-	const [selectedWidth, setSelectedWidth] = useState<OptionType>(
-		contentWidthArr[0]
-	);
-	//content width selection
+	//artice styles state
+	const [styleState, setStyleState] =
+		useState<ArticleStateType>(defaultArticleState);
+	//artice styles state
 
 	//sidebar
 	const [isOpenState, setOpenState] = useState(false);
 	const sideBarRef = useRef<HTMLElement | null>(null);
 	//sidebar
 
+	const handleOnChange = (field: keyof ArticleStateType) => {
+		return (value: OptionType) => {
+			setStyleState((prevState) => ({ ...prevState, [field]: value }));
+		};
+	};
+
 	function toggleSidebar() {
 		setOpenState(!isOpenState);
 	}
 
 	function closeSidebar() {
-		setOpenState(false);
+		if (isOpenState) setOpenState(false);
 	}
 
 	function handleSubmit() {
-		styleSetter({
-			fontFamilyOption: selectedFont,
-			fontSizeOption: selectedSize,
-			fontColor: selectedColor,
-			backgroundColor: selectedBGColor,
-			contentWidth: selectedWidth,
-		});
-	}
-
-	//Вынесено в отдельную функцию, чтобы разгрузить handleReset
-	function resetForm() {
-		setSelectedFont(defaultArticleState.fontFamilyOption);
-		setSelectedSize(defaultArticleState.fontSizeOption);
-		setSelectedColor(defaultArticleState.fontColor);
-		setSelectedBGColor(defaultArticleState.backgroundColor);
-		setSelectedWidth(defaultArticleState.contentWidth);
+		styleSetter(styleState);
 	}
 
 	function handleReset() {
-		resetForm();
+		setStyleState(defaultArticleState);
 		styleSetter({
 			fontFamilyOption: defaultArticleState.fontFamilyOption,
 			fontSizeOption: defaultArticleState.fontSizeOption,
@@ -108,34 +78,34 @@ export const ArticleParamsForm = ({
 				<form className={styles.form}>
 					<h1 className={styles.header}>Задайте параметры</h1>
 					<Select
-						selected={selectedFont}
-						onChange={setSelectedFont}
+						selected={styleState.fontFamilyOption}
+						onChange={handleOnChange('fontFamilyOption')}
 						options={fontFamilyOptions}
 						title='Шрифт'
 					/>
 					<Select
-						selected={selectedColor}
-						onChange={setSelectedColor}
+						selected={styleState.fontColor}
+						onChange={handleOnChange('fontColor')}
 						options={fontColors}
 						title='Цвет шрифта'
 					/>
 					<RadioGroup
-						selected={selectedSize}
+						selected={styleState.fontSizeOption}
 						name='size'
-						onChange={setSelectedSize}
+						onChange={handleOnChange('fontSizeOption')}
 						options={fontSizeOptions}
 						title='Размер шрифта'
 					/>
 					<Separator />
 					<Select
-						selected={selectedBGColor}
-						onChange={setSelectedBGColor}
+						selected={styleState.backgroundColor}
+						onChange={handleOnChange('backgroundColor')}
 						options={backgroundColors}
 						title='Цвет фона'
 					/>
 					<Select
-						selected={selectedWidth}
-						onChange={setSelectedWidth}
+						selected={styleState.contentWidth}
+						onChange={handleOnChange('contentWidth')}
 						options={contentWidthArr}
 						title='Ширина контента'
 					/>

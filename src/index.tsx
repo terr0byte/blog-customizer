@@ -16,9 +16,8 @@ const domNode = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(domNode);
 
 const App = () => {
-	const [styleOptions, setStyleOptions] = useState<ArticleStateType | null>(
-		null
-	);
+	const [styleOptions, setStyleOptions] =
+		useState<ArticleStateType>(defaultArticleState);
 
 	return (
 		<main
