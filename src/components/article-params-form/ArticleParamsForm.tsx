@@ -7,98 +7,137 @@ import {
 	fontColors,
 	backgroundColors,
 	contentWidthArr,
+	OptionType,
+	defaultArticleState,
 	ArticleStateType,
 } from 'src/constants/articleProps';
 
 import styles from './ArticleParamsForm.module.scss';
-import { FontSelector } from '../font-selector/FontSelector';
-import { FontSizeSelector } from '../font-size-selector/FontSizeSelector';
-import { FontColorSelector } from '../font-color-selector/FontColorSelector';
 import { Separator } from 'src/ui/separator';
-import { BGColorSelector } from '../bg-color-selector/BGColorSelector';
-import { ArticleWidthSelector } from '../article-width-selector/ArticleWidthSelector';
-
-type styleType = {
-	font: string;
-	fontSize: string;
-	fontColor: string;
-	bgColor: string;
-	width: string;
-};
+import { Select } from 'src/ui/select/Select';
+import { RadioGroup } from 'src/ui/radio-group/RadioGroup';
+import clsx from 'clsx';
 
 export const ArticleParamsForm = ({
 	styleSetter,
-	defaultStyles,
 }: {
-	styleSetter: React.Dispatch<React.SetStateAction<styleType | null>>;
-	defaultStyles: ArticleStateType;
+	styleSetter: React.Dispatch<React.SetStateAction<ArticleStateType | null>>;
 }) => {
-	const styleRef = useRef<styleType>({
-		font: '',
-		fontSize: '',
-		fontColor: '',
-		bgColor: '',
-		width: '',
-	});
+	//font selection
+	const [selectedFont, setSelectedFont] = useState<OptionType>(
+		fontFamilyOptions[0]
+	);
+	//font selection
+
+	//font size radio selection
+	const [selectedSize, setSelectedSize] = useState(fontSizeOptions[0]);
+	//font size radio selection
+
+	//font color selection
+	const [selectedColor, setSelectedColor] = useState<OptionType>(fontColors[0]);
+	//font color selection
+
+	//bg color selection
+	const [selectedBGColor, setSelectedBGColor] = useState<OptionType>(
+		backgroundColors[0]
+	);
+	//bg color selection
+
+	//content width selection
+	const [selectedWidth, setSelectedWidth] = useState<OptionType>(
+		contentWidthArr[0]
+	);
+	//content width selection
 
 	//sidebar
-	const [openState, setOpenState] = useState(false);
+	const [isOpenState, setOpenState] = useState(false);
 	const sideBarRef = useRef<HTMLElement | null>(null);
 	//sidebar
 
 	function toggleSidebar() {
-		setOpenState(!openState);
-		if (sideBarRef) sideBarRef.current?.classList.toggle(styles.container_open);
+		setOpenState(!isOpenState);
+	}
+
+	function closeSidebar() {
+		setOpenState(false);
 	}
 
 	function handleSubmit() {
-		console.log(styleRef.current);
 		styleSetter({
-			font: styleRef.current.font,
-			fontSize: styleRef.current.fontSize,
-			fontColor: styleRef.current.fontColor,
-			bgColor: styleRef.current.bgColor,
-			width: styleRef.current.width,
+			fontFamilyOption: selectedFont,
+			fontSizeOption: selectedSize,
+			fontColor: selectedColor,
+			backgroundColor: selectedBGColor,
+			contentWidth: selectedWidth,
 		});
 	}
 
+	//Вынесено в отдельную функцию, чтобы разгрузить handleReset
+	function resetForm() {
+		setSelectedFont(defaultArticleState.fontFamilyOption);
+		setSelectedSize(defaultArticleState.fontSizeOption);
+		setSelectedColor(defaultArticleState.fontColor);
+		setSelectedBGColor(defaultArticleState.backgroundColor);
+		setSelectedWidth(defaultArticleState.contentWidth);
+	}
+
 	function handleReset() {
+		resetForm();
 		styleSetter({
-			font: defaultStyles.fontFamilyOption.value,
-			fontSize: defaultStyles.fontSizeOption.value,
-			fontColor: defaultStyles.fontColor.value,
-			bgColor: defaultStyles.backgroundColor.value,
-			width: defaultStyles.contentWidth.value,
+			fontFamilyOption: defaultArticleState.fontFamilyOption,
+			fontSizeOption: defaultArticleState.fontSizeOption,
+			fontColor: defaultArticleState.fontColor,
+			backgroundColor: defaultArticleState.backgroundColor,
+			contentWidth: defaultArticleState.contentWidth,
 		});
 	}
+
 	return (
 		<>
 			<ArrowButton
-				isOpen={openState}
+				isOpen={isOpenState}
 				onClick={() => {
 					toggleSidebar();
 				}}
 			/>
-			<aside ref={sideBarRef} className={styles.container}>
+			<aside
+				ref={sideBarRef}
+				className={clsx(styles.container, {
+					[styles.container_open]: isOpenState,
+				})}>
 				<form className={styles.form}>
 					<h1 className={styles.header}>Задайте параметры</h1>
-					<FontSelector
-						fontFamilyOptions={fontFamilyOptions}
-						styleRef={styleRef}
+					<Select
+						selected={selectedFont}
+						onChange={setSelectedFont}
+						options={fontFamilyOptions}
+						title='Шрифт'
 					/>
-					<FontSizeSelector
-						fontSizeOptions={fontSizeOptions}
-						styleRef={styleRef}
+					<Select
+						selected={selectedColor}
+						onChange={setSelectedColor}
+						options={fontColors}
+						title='Цвет шрифта'
 					/>
-					<FontColorSelector fontColors={fontColors} styleRef={styleRef} />
+					<RadioGroup
+						selected={selectedSize}
+						name='size'
+						onChange={setSelectedSize}
+						options={fontSizeOptions}
+						title='Размер шрифта'
+					/>
 					<Separator />
-					<BGColorSelector
-						backgroundColors={backgroundColors}
-						styleRef={styleRef}
+					<Select
+						selected={selectedBGColor}
+						onChange={setSelectedBGColor}
+						options={backgroundColors}
+						title='Цвет фона'
 					/>
-					<ArticleWidthSelector
-						contentWidthArr={contentWidthArr}
-						styleRef={styleRef}
+					<Select
+						selected={selectedWidth}
+						onChange={setSelectedWidth}
+						options={contentWidthArr}
+						title='Ширина контента'
 					/>
 					<div className={styles.bottomContainer}>
 						<Button
@@ -116,6 +155,7 @@ export const ArticleParamsForm = ({
 					</div>
 				</form>
 			</aside>
+			<div className={styles.overlay} onClick={closeSidebar}></div>
 		</>
 	);
 };

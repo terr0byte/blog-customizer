@@ -1,1 +1,0 @@
-export { ArticleWidthSelector } from './ArticleWidthSelector';
