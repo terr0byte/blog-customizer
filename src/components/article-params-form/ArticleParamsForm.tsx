@@ -41,12 +41,12 @@ export const ArticleParamsForm = ({
 	};
 
 	function toggleSidebar() {
+		setOpenState(!isOpenState); //не понимаю почему, но если поставить setOpenState перед условной конструкцией, все работает нормально, но если после, то слушатель живет еще на 1 клик после закрытия сайдбара
 		if (!isOpenState) {
 			document.addEventListener('click', closeSidebar);
 		} else {
 			document.removeEventListener('click', closeSidebar);
 		}
-		setOpenState(!isOpenState);
 	}
 
 	function closeSidebar(e: MouseEvent) {
