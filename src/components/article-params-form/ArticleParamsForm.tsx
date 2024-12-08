@@ -31,6 +31,7 @@ export const ArticleParamsForm = ({
 	//sidebar
 	const [isOpenState, setOpenState] = useState(false);
 	const sideBarRef = useRef<HTMLElement | null>(null);
+	const overlayRef = useRef<HTMLDivElement | null>(null);
 	//sidebar
 
 	const handleOnChange = (field: keyof ArticleStateType) => {
@@ -40,11 +41,19 @@ export const ArticleParamsForm = ({
 	};
 
 	function toggleSidebar() {
+		if (!isOpenState) {
+			document.addEventListener('click', closeSidebar);
+		} else {
+			document.removeEventListener('click', closeSidebar);
+		}
 		setOpenState(!isOpenState);
 	}
 
-	function closeSidebar() {
-		if (isOpenState) setOpenState(false);
+	function closeSidebar(e: MouseEvent) {
+		if (e.target === overlayRef.current) {
+			document.removeEventListener('click', closeSidebar);
+			setOpenState(false);
+		}
 	}
 
 	function handleSubmit() {
@@ -125,7 +134,7 @@ export const ArticleParamsForm = ({
 					</div>
 				</form>
 			</aside>
-			<div className={styles.overlay} onClick={closeSidebar}></div>
+			<div className={styles.overlay} ref={overlayRef}></div>
 		</>
 	);
 };
