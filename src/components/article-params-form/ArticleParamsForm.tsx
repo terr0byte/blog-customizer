@@ -15,6 +15,7 @@ import {
 import styles from './ArticleParamsForm.module.scss';
 import { Separator } from 'src/ui/separator';
 import { Select } from 'src/ui/select/Select';
+import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
 import { RadioGroup } from 'src/ui/radio-group/RadioGroup';
 import clsx from 'clsx';
 
@@ -31,7 +32,7 @@ export const ArticleParamsForm = ({
 	//sidebar
 	const [isOpenState, setOpenState] = useState(false);
 	const sideBarRef = useRef<HTMLElement | null>(null);
-	const overlayRef = useRef<HTMLDivElement | null>(null);
+	const rootRef = useRef<HTMLDivElement | null>(null);
 	//sidebar
 
 	const handleOnChange = (field: keyof ArticleStateType) => {
@@ -41,19 +42,11 @@ export const ArticleParamsForm = ({
 	};
 
 	function toggleSidebar() {
-		setOpenState(!isOpenState); //не понимаю почему, но если поставить setOpenState перед условной конструкцией, все работает нормально, но если после, то слушатель живет еще на 1 клик после закрытия сайдбара
-		if (!isOpenState) {
-			document.addEventListener('click', closeSidebar);
-		} else {
-			document.removeEventListener('click', closeSidebar);
-		}
+		setOpenState(!isOpenState);
 	}
 
-	function closeSidebar(e: MouseEvent) {
-		if (e.target === overlayRef.current) {
-			document.removeEventListener('click', closeSidebar);
-			setOpenState(false);
-		}
+	function closeSidebar() {
+		setOpenState(false);
 	}
 
 	function handleSubmit() {
@@ -71,8 +64,15 @@ export const ArticleParamsForm = ({
 		});
 	}
 
+	useOutsideClickClose({
+		isOpen: isOpenState,
+		rootRef: rootRef,
+		onClose: closeSidebar,
+		onChange: setOpenState,
+	});
+
 	return (
-		<>
+		<div ref={rootRef}>
 			<ArrowButton
 				isOpen={isOpenState}
 				onClick={() => {
@@ -134,7 +134,6 @@ export const ArticleParamsForm = ({
 					</div>
 				</form>
 			</aside>
-			<div className={styles.overlay} ref={overlayRef}></div>
-		</>
+		</div>
 	);
 };
