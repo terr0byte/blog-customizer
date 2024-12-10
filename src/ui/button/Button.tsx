@@ -14,6 +14,10 @@ export const Button = ({
 	htmlType?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'];
 	type: 'apply' | 'clear';
 }) => {
+	function clickHandle(e: { preventDefault: () => void }) {
+		e.preventDefault();
+		if (onClick) onClick();
+	}
 	return (
 		<button
 			className={clsx(
@@ -22,7 +26,7 @@ export const Button = ({
 				{ [styles.button_clear]: type === 'clear' }
 			)}
 			type={htmlType}
-			onClick={onClick}>
+			onClick={clickHandle}>
 			<Text weight={800} uppercase>
 				{title}
 			</Text>
